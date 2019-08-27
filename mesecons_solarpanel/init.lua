@@ -28,6 +28,20 @@ minetest.register_node("mesecons_solarpanel:solar_panel_on", {
 		rules = mesecon.rules.wallmounted_get,
 	}},
 	on_blast = mesecon.on_blastnode,
+	on_construct = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		local light = minetest.get_node_light(pos, nil)
+		local node = minetest.get_node(pos)
+		if light < 12 then
+			node.name = "mesecons_solarpanel:solar_panel_off"
+			minetest.swap_node(pos, node)
+			mesecon.receptor_off(pos, mesecon.rules.wallmounted_get(node))
+		end
+		return true
+	end,
 })
 
 -- Solar Panel
@@ -60,6 +74,20 @@ minetest.register_node("mesecons_solarpanel:solar_panel_off", {
 		rules = mesecon.rules.wallmounted_get,
 	}},
 	on_blast = mesecon.on_blastnode,
+	on_construct = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		local light = minetest.get_node_light(pos, nil)
+		local node = minetest.get_node(pos)
+		if light >= 12 then
+			node.name = "mesecons_solarpanel:solar_panel_on"
+			minetest.swap_node(pos, node)
+			mesecon.receptor_on(pos, mesecon.rules.wallmounted_get(node))
+		end
+		return true
+	end,
 })
 
 minetest.register_craft({
@@ -70,32 +98,15 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_abm(
-	{nodenames = {"mesecons_solarpanel:solar_panel_off"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		local light = minetest.get_node_light(pos, nil)
-
-		if light >= 12 then
-			node.name = "mesecons_solarpanel:solar_panel_on"
-			minetest.swap_node(pos, node)
-			mesecon.receptor_on(pos, mesecon.rules.wallmounted_get(node))
-		end
+-- LBM to start timers on existing, ABM-driven nodes
+minetest.register_lbm({
+	name = "mesecons_solarpanel:timer_init",
+	nodenames = {"mesecons_solarpanel:solar_panel_off",
+			"mesecons_solarpanel:solar_panel_on"},
+	run_at_every_load = false,
+	action = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
 	end,
 })
 
-minetest.register_abm(
-	{nodenames = {"mesecons_solarpanel:solar_panel_on"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node, active_object_count, active_object_count_wider)
-		local light = minetest.get_node_light(pos, nil)
-
-		if light < 12 then
-			node.name = "mesecons_solarpanel:solar_panel_off"
-			minetest.swap_node(pos, node)
-			mesecon.receptor_off(pos, mesecon.rules.wallmounted_get(node))
-		end
-	end,
-})

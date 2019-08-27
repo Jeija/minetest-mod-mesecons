@@ -49,6 +49,32 @@ local torch_selectionbox =
 	wall_side = {-0.5, -0.1, -0.1, -0.5+0.6, 0.1, 0.1},
 }
 
+local torch_update = function(pos)
+	
+	local node = minetest.get_node(pos)
+	local is_powered = false
+	for _, rule in ipairs(torch_get_input_rules(node)) do
+		local src = vector.add(pos, rule)
+		if mesecon.is_power_on(src) then
+			is_powered = true
+		end
+	end
+
+	if is_powered then
+		if node.name == "mesecons_torch:mesecon_torch_on" then
+			minetest.swap_node(pos, {name = "mesecons_torch:mesecon_torch_off", param2 = node.param2})
+			mesecon.receptor_off(pos, torch_get_output_rules(node))
+		end
+	else
+		if node.name == "mesecons_torch:mesecon_torch_off" then
+			minetest.swap_node(pos, {name = "mesecons_torch:mesecon_torch_on", param2 = node.param2})
+			mesecon.receptor_on(pos, torch_get_output_rules(node))
+		end
+	end
+	
+
+end
+
 minetest.register_node("mesecons_torch:mesecon_torch_off", {
 	drawtype = "torchlike",
 	tiles = {"jeija_torches_off.png", "jeija_torches_off_ceiling.png", "jeija_torches_off_side.png"},
@@ -66,6 +92,11 @@ minetest.register_node("mesecons_torch:mesecon_torch_off", {
 		rules = torch_get_output_rules
 	}},
 	on_blast = mesecon.on_blastnode,
+	on_construct = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = torch_update,
 })
 
 minetest.register_node("mesecons_torch:mesecon_torch_on", {
@@ -88,32 +119,25 @@ minetest.register_node("mesecons_torch:mesecon_torch_on", {
 		rules = torch_get_output_rules
 	}},
 	on_blast = mesecon.on_blastnode,
+	on_construct = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = torch_update,
 })
 
-minetest.register_abm({
-	nodenames = {"mesecons_torch:mesecon_torch_off","mesecons_torch:mesecon_torch_on"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		local is_powered = false
-		for _, rule in ipairs(torch_get_input_rules(node)) do
-			local src = vector.add(pos, rule)
-			if mesecon.is_power_on(src) then
-				is_powered = true
-			end
-		end
-
-		if is_powered then
-			if node.name == "mesecons_torch:mesecon_torch_on" then
-				minetest.swap_node(pos, {name = "mesecons_torch:mesecon_torch_off", param2 = node.param2})
-				mesecon.receptor_off(pos, torch_get_output_rules(node))
-			end
-		elseif node.name == "mesecons_torch:mesecon_torch_off" then
-			minetest.swap_node(pos, {name = "mesecons_torch:mesecon_torch_on", param2 = node.param2})
-			mesecon.receptor_on(pos, torch_get_output_rules(node))
-		end
-	end
+-- LBM to start timers on existing, ABM-driven nodes
+minetest.register_lbm({
+	name = "mesecons_torch:timer_init",
+	nodenames = {"mesecons_torch:mesecon_torch_off",
+			"mesecons_torch:mesecon_torch_on"},
+	run_at_every_load = false,
+	action = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
 })
+
 
 -- Param2 Table (Block Attached To)
 -- 5 = z-1

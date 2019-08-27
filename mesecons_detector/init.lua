@@ -74,11 +74,24 @@ minetest.register_node("mesecons_detector:object_detector_off", {
 		state = mesecon.state.off,
 		rules = mesecon.rules.pplate
 	}},
-	on_construct = object_detector_make_formspec,
+	on_construct = function(pos)
+		object_detector_make_formspec(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		if not object_detector_scan(pos) then return true end
+		local node = minetest.get_node(pos)
+		node.name = "mesecons_detector:object_detector_on"
+		minetest.swap_node(pos, node)
+		mesecon.receptor_on(pos, mesecon.rules.pplate)
+		return true
+	end,
 	on_receive_fields = object_detector_on_receive_fields,
 	sounds = default.node_sound_stone_defaults(),
 	digiline = object_detector_digiline,
 	on_blast = mesecon.on_blastnode,
+	
 })
 
 minetest.register_node("mesecons_detector:object_detector_on", {
@@ -92,7 +105,19 @@ minetest.register_node("mesecons_detector:object_detector_on", {
 		state = mesecon.state.on,
 		rules = mesecon.rules.pplate
 	}},
-	on_construct = object_detector_make_formspec,
+	on_construct = function(pos)
+		object_detector_make_formspec(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		if object_detector_scan(pos) then return true end
+		local node = minetest.get_node(pos)
+		node.name = "mesecons_detector:object_detector_off"
+		minetest.swap_node(pos, node)
+		mesecon.receptor_off(pos, mesecon.rules.pplate)
+		return true
+	end,
 	on_receive_fields = object_detector_on_receive_fields,
 	sounds = default.node_sound_stone_defaults(),
 	digiline = object_detector_digiline,
@@ -115,32 +140,6 @@ minetest.register_craft({
 		{"default:steel_ingot", "mesecons_microcontroller:microcontroller0000", "default:steel_ingot"},
 		{"default:steel_ingot", "group:mesecon_conductor_craftable", "default:steel_ingot"},
 	}
-})
-
-minetest.register_abm({
-	nodenames = {"mesecons_detector:object_detector_off"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		if not object_detector_scan(pos) then return end
-
-		node.name = "mesecons_detector:object_detector_on"
-		minetest.swap_node(pos, node)
-		mesecon.receptor_on(pos, mesecon.rules.pplate)
-	end,
-})
-
-minetest.register_abm({
-	nodenames = {"mesecons_detector:object_detector_on"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		if object_detector_scan(pos) then return end
-
-		node.name = "mesecons_detector:object_detector_off"
-		minetest.swap_node(pos, node)
-		mesecon.receptor_off(pos, mesecon.rules.pplate)
-	end,
 })
 
 -- Node detector
@@ -266,7 +265,19 @@ minetest.register_node("mesecons_detector:node_detector_off", {
 	mesecons = {receptor = {
 		state = mesecon.state.off
 	}},
-	on_construct = node_detector_make_formspec,
+	on_construct = function(pos)
+		node_detector_make_formspec(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		if not node_detector_scan(pos) then return true end
+		local node = minetest.get_node(pos)
+		node.name = "mesecons_detector:node_detector_on"
+		minetest.swap_node(pos, node)
+		mesecon.receptor_on(pos)
+		return true
+	end,
 	on_receive_fields = node_detector_on_receive_fields,
 	sounds = default.node_sound_stone_defaults(),
 	digiline = node_detector_digiline,
@@ -284,7 +295,19 @@ minetest.register_node("mesecons_detector:node_detector_on", {
 	mesecons = {receptor = {
 		state = mesecon.state.on
 	}},
-	on_construct = node_detector_make_formspec,
+	on_construct = function(pos)
+		node_detector_make_formspec(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
+	end,
+	on_timer = function(pos)
+		if node_detector_scan(pos) then return true end
+		local node = minetest.get_node(pos)
+		node.name = "mesecons_detector:node_detector_off"
+		minetest.swap_node(pos, node)
+		mesecon.receptor_off(pos)
+		return true
+	end,
 	on_receive_fields = node_detector_on_receive_fields,
 	sounds = default.node_sound_stone_defaults(),
 	digiline = node_detector_digiline,
@@ -309,28 +332,17 @@ minetest.register_craft({
 	}
 })
 
-minetest.register_abm({
-	nodenames = {"mesecons_detector:node_detector_off"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		if not node_detector_scan(pos) then return end
 
-		node.name = "mesecons_detector:node_detector_on"
-		minetest.swap_node(pos, node)
-		mesecon.receptor_on(pos)
-	end,
-})
-
-minetest.register_abm({
-	nodenames = {"mesecons_detector:node_detector_on"},
-	interval = 1,
-	chance = 1,
-	action = function(pos, node)
-		if node_detector_scan(pos) then return end
-
-		node.name = "mesecons_detector:node_detector_off"
-		minetest.swap_node(pos, node)
-		mesecon.receptor_off(pos)
+-- LBM to start timers on existing, ABM-driven nodes
+minetest.register_lbm({
+	name = "mesecons_detector:timer_init",
+	nodenames = {"mesecons_detector:object_detector_off",
+			"mesecons_detector:object_detector_on", 
+			"mesecons_detector:node_detector_off", 
+			"mesecons_detector:node_detector_on"},
+	run_at_every_load = false,
+	action = function(pos)
+		local timer = minetest.get_node_timer(pos)
+		timer:start(1)
 	end,
 })
