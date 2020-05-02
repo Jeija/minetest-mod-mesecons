@@ -1,8 +1,10 @@
+local S = minetest.get_translator("mesecons_switch")
+
 -- mesecons_switch
 
 mesecon.register_node("mesecons_switch:mesecon_switch", {
 	paramtype2="facedir",
-	description="Switch",
+	description=S("Switch"),
 	is_ground_content = false,
 	sounds = default.node_sound_stone_defaults(),
 	on_rightclick = function (pos, node)

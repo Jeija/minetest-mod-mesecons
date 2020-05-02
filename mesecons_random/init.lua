@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_random")
+
 -- REMOVESTONE
 
 minetest.register_node("mesecons_random:removestone", {
@@ -5,7 +7,7 @@ minetest.register_node("mesecons_random:removestone", {
 	is_ground_content = false,
 	inventory_image = minetest.inventorycube("jeija_removestone_inv.png"),
 	groups = {cracky=3},
-	description="Removestone",
+	description=S("Removestone"),
 	sounds = default.node_sound_stone_defaults(),
 	mesecons = {effector = {
 		action_on = function (pos, node)
@@ -29,7 +31,7 @@ minetest.register_craft({
 -- GHOSTSTONE
 
 minetest.register_node("mesecons_random:ghoststone", {
-	description="Ghoststone",
+	description=S("Ghoststone"),
 	tiles = {"jeija_ghoststone.png"},
 	is_ground_content = false,
 	inventory_image = minetest.inventorycube("jeija_ghoststone_inv.png"),

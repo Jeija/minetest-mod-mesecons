@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_blinkyplant")
+
 -- The BLINKY_PLANT
 
 local toggle_timer = function (pos)
@@ -20,7 +22,7 @@ local on_timer = function (pos)
 end
 
 mesecon.register_node("mesecons_blinkyplant:blinky_plant", {
-	description="Blinky Plant",
+	description=S("Blinky Plant"),
 	drawtype = "plantlike",
 	inventory_image = "jeija_blinky_plant_off.png",
 	paramtype = "light",

@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_solarpanel")
+
 -- Solar Panel
 minetest.register_node("mesecons_solarpanel:solar_panel_on", {
 	drawtype = "nodebox",
@@ -53,7 +55,7 @@ minetest.register_node("mesecons_solarpanel:solar_panel_off", {
 		wall_side   = { -8/16, -7/16, -7/16, -7/16,  7/16, 7/16 },
 	},
 	groups = {dig_immediate=3},
-	description = "Solar Panel",
+	description = S("Solar Panel"),
 	sounds = default.node_sound_glass_defaults(),
 	mesecons = {receptor = {
 		state = mesecon.state.off,

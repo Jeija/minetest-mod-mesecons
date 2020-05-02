@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_hydroturbine")
+
 local screwdriver_exists = minetest.global_exists("screwdriver")
 
 local function insulated_wire_get_rules(node)
@@ -11,7 +13,7 @@ end
 
 minetest.register_node("mesecons_insulated:insulated_on", {
 	drawtype = "nodebox",
-	description = "Straight Insulated Mesecon",
+	description = S("Straight Insulated Mesecon"),
 	tiles = {
 		"jeija_insulated_wire_sides_on.png",
 		"jeija_insulated_wire_sides_on.png",
@@ -48,7 +50,7 @@ minetest.register_node("mesecons_insulated:insulated_on", {
 
 minetest.register_node("mesecons_insulated:insulated_off", {
 	drawtype = "nodebox",
-	description = "Straight Insulated Mesecon",
+	description = S("Straight Insulated Mesecon"),
 	tiles = {
 		"jeija_insulated_wire_sides_off.png",
 		"jeija_insulated_wire_sides_off.png",

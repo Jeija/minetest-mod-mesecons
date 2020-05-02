@@ -1,8 +1,10 @@
+local S = minetest.get_translator("mesecons_walllever")
+
 -- WALL LEVER
 -- Basically a switch that can be attached to a wall
 -- Powers the block 2 nodes behind (using a receiver)
 mesecon.register_node("mesecons_walllever:wall_lever", {
-	description="Lever",
+	description=S("Lever"),
 	drawtype = "mesh",
 	inventory_image = "jeija_wall_lever_inv.png",
 	wield_image = "jeija_wall_lever_inv.png",

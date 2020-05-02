@@ -1,3 +1,4 @@
+local S = minetest.get_translator("mesecons_extrawires")
 local screwdriver_exists = minetest.global_exists("screwdriver")
 
 local corner_nodebox = {
@@ -56,7 +57,7 @@ minetest.register_node("mesecons_extrawires:corner_on", {
 
 minetest.register_node("mesecons_extrawires:corner_off", {
 	drawtype = "nodebox",
-	description = "Insulated Mesecon Corner",
+	description = S("Insulated Mesecon Corner"),
 	tiles = {
 		"jeija_insulated_wire_curved_tb_off.png",
 		"jeija_insulated_wire_curved_tb_off.png^[transformR270",

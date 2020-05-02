@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_wires")
+
 -- naming scheme: wire:(xp)(zp)(xm)(zm)(xpyp)(zpyp)(xmyp)(zmyp)_on/off
 -- where x= x direction, z= z direction, y= y direction, p = +1, m = -1, e.g. xpym = {x=1, y=-1, z=0}
 -- The (xp)/(zpyp)/.. statements shall be replaced by either 0 or 1
@@ -202,7 +204,7 @@ local function register_wires()
 		end
 
 		mesecon.register_node(":mesecons:wire_"..nodeid, {
-			description = "Mesecon",
+			description = S("Mesecon"),
 			drawtype = "nodebox",
 			inventory_image = "mesecons_wire_inv.png",
 			wield_image = "mesecons_wire_inv.png",

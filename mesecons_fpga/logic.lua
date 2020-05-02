@@ -1,3 +1,4 @@
+local S = minetest.get_translator("mesecons_fpga")
 
 local lg = {}
 
@@ -132,34 +133,34 @@ lg.validate_single = function(t, i)
 
 	-- check for completeness
 	if not gate_data then
-		return {i = i, msg = "Gate type is required"}
+		return {i = i, msg = S("Gate type is required")}
 	elseif gate_data.unary then
 		if elem.op1 ~= nil or elem.op2 == nil or elem.dst == nil then
-			return {i = i, msg = "Second operand (only) and destination are required"}
+			return {i = i, msg = S("Second operand (only) and destination are required")}
 		end
 	else
 		if elem.op1 == nil or elem.op2 == nil or elem.dst == nil then
-			return {i = i, msg = "Operands and destination are required"}
+			return {i = i, msg = S("Operands and destination are required")}
 		end
 	end
 	-- check whether operands/destination are identical
 	if compare_op(elem.op1, elem.op2) then
-		return {i = i, msg = "Operands cannot be identical"}
+		return {i = i, msg = S("Operands cannot be identical")}
 	end
 	if compare_op(elem.op1, elem.dst, true) or compare_op(elem.op2, elem.dst, true) then
-		return {i = i, msg = "Destination and operands must be different"}
+		return {i = i, msg = S("Destination and operands must be different")}
 	end
 	-- check whether operands point to defined registers
 	if elem.op1 ~= nil and elem.op1.type == "reg"
 			and not is_reg_written_to(t, elem.op1.n, i) then
-		return {i = i, msg = "First operand is undefined register"}
+		return {i = i, msg = S("First operand is undefined register")}
 	end
 	if elem.op2.type == "reg" and not is_reg_written_to(t, elem.op2.n, i) then
-		return {i = i, msg = "Second operand is undefined register"}
+		return {i = i, msg = S("Second operand is undefined register")}
 	end
 	-- check whether destination points to undefined register
 	if elem.dst.type == "reg" and is_reg_written_to(t, elem.dst.n, i) then
-		return {i = i, msg = "Destination is already used register"}
+		return {i = i, msg = S("Destination is already used register")}
 	end
 
 	return nil

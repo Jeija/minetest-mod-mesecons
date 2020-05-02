@@ -1,3 +1,6 @@
+local S = minetest.get_translator("mesecons_fpga")
+local F = minetest.formspec_escape
+
 local plg = {}
 plg.rules = {}
 -- per-player formspec positions
@@ -59,7 +62,7 @@ plg.register_nodes = function(template)
 end
 
 plg.register_nodes({
-	description = "FPGA",
+	description = S("FPGA"),
 	drawtype = "nodebox",
 	tiles = {
 		"", -- replaced later
@@ -94,7 +97,7 @@ plg.register_nodes({
 
 		meta:set_string("instr", lcore.serialize(is))
 		meta:set_int("valid", 0)
-		meta:set_string("infotext", "FPGA")
+		meta:set_string("infotext", S("FPGA"))
 	end,
 	on_rightclick = function(pos, node, clicker)
 		if not minetest.is_player(clicker) then
@@ -138,13 +141,13 @@ plg.register_nodes({
 			dir = 1
 			if user and user:is_player() then
 				minetest.chat_send_player(user:get_player_name(),
-						"FPGA ports have been rotated clockwise.")
+						S("FPGA ports have been rotated clockwise."))
 			end
 		elseif mode == screwdriver.ROTATE_AXIS then -- counter-clockwise
 			dir = -1
 			if user and user:is_player() then
 				minetest.chat_send_player(user:get_player_name(),
-						"FPGA ports have been rotated counter-clockwise.")
+						S("FPGA ports have been rotated counter-clockwise."))
 			end
 		end
 
@@ -202,17 +205,17 @@ plg.to_formspec_string = function(is, err)
 			x, y, name, table.concat(titles, ","), selected)
 	end
 	local s = "size[9,9]"..
-		"label[3.4,-0.15;FPGA gate configuration]"..
-		"button[7,7.5;2,2.5;program;Program]"..
+		"label[3.4,-0.15;"..F(S("FPGA gate configuration")).."]"..
+		"button[7,7.5;2,2.5;program;"..F(S("Program")).."]"..
 		"box[4.2,0.5;0.03,7;#ffffff]"..
-		"label[0.25,0.25;op. 1]"..
-		"label[1.0,0.25;gate type]"..
-		"label[2.125,0.25;op. 2]"..
-		"label[3.15,0.25;dest]"..
-		"label[4.5,0.25;op. 1]"..
-		"label[5.25,0.25;gate type]"..
-		"label[6.375,0.25;op. 2]"..
-		"label[7.4,0.25;dest]"
+		"label[0.25,0.25;"..F(S("op. 1")).."]"..
+		"label[1.0,0.25;"..F(S("gate type")).."]"..
+		"label[2.125,0.25;"..F(S("op. 2")).."]"..
+		"label[3.15,0.25;"..F(S("dest")).."]"..
+		"label[4.5,0.25;"..F(S("op. 1")).."]"..
+		"label[5.25,0.25;"..F(S("gate type")).."]"..
+		"label[6.375,0.25;"..F(S("op. 2")).."]"..
+		"label[7.4,0.25;"..F(S("dest")).."]"
 	local x = 1 - 0.75
 	local y = 1 - 0.25
 	for i = 1, 14 do
@@ -232,7 +235,7 @@ plg.to_formspec_string = function(is, err)
 	if err then
 		local fmsg = minetest.colorize("#ff0000", minetest.formspec_escape(err.msg))
 		s = s .. plg.red_box_around(err.i) ..
-			"label[0.25,8.25;The gate configuration is erroneous in the marked area:]"..
+			"label[0.25,8.25;"..F(S("The gate configuration is erroneous in the marked area:")).."]"..
 			"label[0.25,8.5;" .. fmsg .. "]"
 	end
 	return s
@@ -276,10 +279,10 @@ plg.update_meta = function(pos, is)
 	local err = lcore.validate(is)
 	if err == nil then
 		meta:set_int("valid", 1)
-		meta:set_string("infotext", "FPGA (functional)")
+		meta:set_string("infotext", S("FPGA (functional)"))
 	else
 		meta:set_int("valid", 0)
-		meta:set_string("infotext", "FPGA")
+		meta:set_string("infotext", S("FPGA"))
 	end
 
 	-- reset ports and run programmed logic
@@ -316,7 +319,7 @@ plg.update = function(pos)
 	elseif mesecon.do_overheat(pos) then
 		plg.setports(pos, false, false, false, false)
 		meta:set_int("valid", 0)
-		meta:set_string("infotext", "FPGA (overheated)")
+		meta:set_string("infotext", S("FPGA (overheated)"))
 		return
 	end
 

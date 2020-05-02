@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_extrawires")
+
 local screwdriver_exists = minetest.global_exists("screwdriver")
 
 local tjunction_nodebox = {
@@ -57,7 +59,7 @@ minetest.register_node("mesecons_extrawires:tjunction_on", {
 
 minetest.register_node("mesecons_extrawires:tjunction_off", {
 	drawtype = "nodebox",
-	description = "Insulated Mesecon T-junction",
+	description = S("Insulated Mesecon T-junction"),
 	tiles = {
 		"jeija_insulated_wire_tjunction_tb_off.png",
 		"jeija_insulated_wire_tjunction_tb_off.png^[transformR180",

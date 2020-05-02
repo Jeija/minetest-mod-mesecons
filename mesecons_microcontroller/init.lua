@@ -1,3 +1,6 @@
+local S = minetest.get_translator("mesecons_microcontroller")
+local F = minetest.formspec_escape
+
 local EEPROM_SIZE = 255
 
 local microc_rules = {}
@@ -56,7 +59,7 @@ if nodename ~= "mesecons_microcontroller:microcontroller0000" then
 end
 
 minetest.register_node(nodename, {
-	description = "Microcontroller",
+	description = S("Microcontroller"),
 	drawtype = "nodebox",
 	tiles = {
 		top,
@@ -89,15 +92,15 @@ minetest.register_node(nodename, {
 		local meta = minetest.get_meta(pos)
 		meta:set_string("code", "")
 		meta:set_string("formspec", "size[9,2.5]"..
-			"field[0.256,-0.2;9,2;code;Code:;]"..
-			"button[0  ,0.2;1.5,3;band;AND]"..
-			"button[1.5,0.2;1.5,3;bxor;XOR]"..
-			"button[3  ,0.2;1.5,3;bnot;NOT]"..
-			"button[4.5,0.2;1.5,3;bnand;NAND]"..
-			"button[6  ,0.2;1.5,3;btflop;T-Flop]"..
-			"button[7.5,0.2;1.5,3;brsflop;RS-Flop]"..
-			"button_exit[3.5,1;2,3;program;Program]")
-		meta:set_string("infotext", "Unprogrammed Microcontroller")
+			"field[0.256,-0.2;9,2;code;"..F(S("Code:"))..";]"..
+			"button[0  ,0.2;1.5,3;band;"..F(S("AND")).."]"..
+			"button[1.5,0.2;1.5,3;bxor;"..F(S("XOR")).."]"..
+			"button[3  ,0.2;1.5,3;bnot;"..F(S("NOT")).."]"..
+			"button[4.5,0.2;1.5,3;bnand;"..F(S("NAND")).."]"..
+			"button[6  ,0.2;1.5,3;btflop;"..F(S("T-Flop")).."]"..
+			"button[7.5,0.2;1.5,3;brsflop;"..F(S("RS-Flop")).."]"..
+			"button_exit[3.5,1;2,3;program;"..F(S("Program")).."]")
+		meta:set_string("infotext", S("Unprogrammed Microcontroller"))
 		local r = ""
 		for i=1, EEPROM_SIZE+1 do r=r.."0" end --Generate a string with EEPROM_SIZE*"0"
 		meta:set_string("eeprom", r)
@@ -127,15 +130,15 @@ minetest.register_node(nodename, {
 
 		meta:set_string("code", fields.code)
 		meta:set_string("formspec", "size[9,2.5]"..
-		"field[0.256,-0.2;9,2;code;Code:;"..minetest.formspec_escape(fields.code).."]"..
-		"button[0  ,0.2;1.5,3;band;AND]"..
-		"button[1.5,0.2;1.5,3;bxor;XOR]"..
-		"button[3  ,0.2;1.5,3;bnot;NOT]"..
-		"button[4.5,0.2;1.5,3;bnand;NAND]"..
-		"button[6  ,0.2;1.5,3;btflop;T-Flop]"..
-		"button[7.5,0.2;1.5,3;brsflop;RS-Flop]"..
-		"button_exit[3.5,1;2,3;program;Program]")
-		meta:set_string("infotext", "Programmed Microcontroller")
+		"field[0.256,-0.2;9,2;code;"..F(S("Code:"))..";"..minetest.formspec_escape(fields.code).."]"..
+		"button[0  ,0.2;1.5,3;band;"..F(S("AND")).."]"..
+		"button[1.5,0.2;1.5,3;bxor;"..F(S("XOR")).."]"..
+		"button[3  ,0.2;1.5,3;bnot;"..F(S("NOT")).."]"..
+		"button[4.5,0.2;1.5,3;bnand;"..F(S("NAND")).."]"..
+		"button[6  ,0.2;1.5,3;btflop;"..F(S("T-Flop")).."]"..
+		"button[7.5,0.2;1.5,3;brsflop;"..F(S("RS-Flop")).."]"..
+		"button_exit[3.5,1;2,3;program;"..F(S("Program")).."]")
+		meta:set_string("infotext", S("Programmed Microcontroller"))
 		yc.reset (pos)
 		yc.update(pos)
 	end,
@@ -199,9 +202,9 @@ yc.update = function(pos)
 	code = string.gsub(code, " ", "")	--Remove all spaces
 	code = string.gsub(code, "	", "")	--Remove all tabs
 	if yc.parsecode(code, pos) == nil then
-		meta:set_string("infotext", "Code not valid!\n"..code)
+		meta:set_string("infotext", S("Code not valid!").."\n"..code)
 	else
-		meta:set_string("infotext", "Working Microcontroller\n"..code)
+		meta:set_string("infotext", S("Working Microcontroller").."\n"..code)
 	end
 end
 
@@ -467,12 +470,12 @@ yc.command_after_execute = function(params)
 	local meta = minetest.get_meta(params.pos)
 	if meta:get_int("afterid") == params.afterid then --make sure the node has not been changed
 		if yc.parsecode(params.code, params.pos) == nil then
-			meta:set_string("infotext", "Code in after() not valid!")
+			meta:set_string("infotext", S("Code in after() not valid!"))
 		else
 			if code ~= nil then
-				meta:set_string("infotext", "Working Microcontroller\n"..code)
+				meta:set_string("infotext", S("Working Microcontroller").."\n"..code)
 			else
-				meta:set_string("infotext", "Working Microcontroller")
+				meta:set_string("infotext", S("Working Microcontroller"))
 			end
 		end
 	end

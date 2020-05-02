@@ -1,8 +1,10 @@
+local S = minetest.get_translator("mesecons_fpga")
+
 return function(plg)
 
 
 minetest.register_tool("mesecons_fpga:programmer", {
-	description = "FPGA Programmer",
+	description = S("FPGA Programmer"),
 	inventory_image = "jeija_fpga_programmer.png",
 	stack_max = 1,
 	on_place = function(itemstack, placer, pointed_thing)
@@ -17,11 +19,11 @@ minetest.register_tool("mesecons_fpga:programmer", {
 
 		local meta = minetest.get_meta(pos)
 		if meta:get_string("instr") == "//////////////" then
-			minetest.chat_send_player(placer:get_player_name(), "This FPGA is unprogrammed.")
+			minetest.chat_send_player(placer:get_player_name(), S("This FPGA is unprogrammed."))
 			return itemstack
 		end
 		itemstack:set_metadata(meta:get_string("instr"))
-		minetest.chat_send_player(placer:get_player_name(), "FPGA gate configuration was successfully copied!")
+		minetest.chat_send_player(placer:get_player_name(), S("FPGA gate configuration was successfully copied!"))
 
 		return itemstack
 	end,
@@ -42,14 +44,14 @@ minetest.register_tool("mesecons_fpga:programmer", {
 
 		local imeta = itemstack:get_metadata()
 		if imeta == "" then
-			minetest.chat_send_player(player_name, "Use shift+right-click to copy a gate configuration first.")
+			minetest.chat_send_player(player_name, S("Use shift+right-click to copy a gate configuration first."))
 			return itemstack
 		end
 
 		local meta = minetest.get_meta(pos)
 		meta:set_string("instr", imeta)
 		plg.update_meta(pos, imeta)
-		minetest.chat_send_player(player_name, "Gate configuration was successfully written to FPGA!")
+		minetest.chat_send_player(player_name, S("Gate configuration was successfully written to FPGA!"))
 
 		return itemstack
 	end

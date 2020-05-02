@@ -1,3 +1,6 @@
+local S = minetest.get_translator("mesecons_luacontroller")
+local F = minetest.formspec_escape
+
 --        ______
 --       |
 --       |
@@ -273,7 +276,7 @@ if mesecon.setting("luacontroller_lightweight_interrupts", false) then
 	get_interrupt = function(pos, itbl, send_warning)
 		return (function(time, iid)
 			if type(time) ~= "number" then error("Delay must be a number") end
-			if iid ~= nil then send_warning("Interrupt IDs are disabled on this server") end
+			if iid ~= nil then send_warning(S("Interrupt IDs are disabled on this server")) end
 			table.insert(itbl, function() minetest.get_node_timer(pos):start(time) end)
 		end)
 	end
@@ -297,7 +300,7 @@ else
 				if #msg_ser <= mesecon.setting("luacontroller_interruptid_maxlen", 256) then
 					mesecon.queue:add_action(pos, "lc_interrupt", {luac_id, iid}, time, iid, 1)
 				else
-					send_warning("An interrupt ID was too large!")
+					send_warning(S("An interrupt ID was too large!"))
 				end
 			end)
 		end
@@ -403,18 +406,18 @@ local function get_digiline_send(pos, itbl, send_warning)
 		-- Make sure channel is string, number or boolean
 		if type(channel) == "string" then
 			if #channel > chan_maxlen then
-				send_warning("Channel string too long.")
+				send_warning(S("Channel string too long."))
 				return false
 			end
 		elseif (type(channel) ~= "string" and type(channel) ~= "number" and type(channel) ~= "boolean") then
-			send_warning("Channel must be string, number or boolean.")
+			send_warning(S("Channel must be string, number or boolean."))
 			return false
 		end
 
 		local msg_cost
 		msg, msg_cost = clean_and_weigh_digiline_message(msg)
 		if msg == nil or msg_cost > maxlen then
-			send_warning("Message was too complex, or contained invalid data.")
+			send_warning(S("Message was too complex, or contained invalid data."))
 			return false
 		end
 
@@ -587,7 +590,7 @@ local function run_inner(pos, code, event)
 	-- 'Last warning' label.
 	local warning = ""
 	local function send_warning(str)
-		warning = "Warning: " .. str
+		warning = S("Warning: @1", str)
 	end
 
 	-- Create environment
@@ -607,7 +610,7 @@ local function run_inner(pos, code, event)
 	-- End string true sandboxing
 	if not success then return false, msg end
 	if type(env.port) ~= "table" then
-		return false, "Ports set are invalid."
+		return false, S("Ports set are invalid.")
 	end
 
 	-- Actually set the ports
@@ -633,9 +636,10 @@ local function reset_formspec(meta, code, errmsg)
 	errmsg = minetest.formspec_escape(tostring(errmsg or ""))
 	meta:set_string("formspec", "size[12,10]"
 		.."background[-0.2,-0.25;12.4,10.75;jeija_luac_background.png]"
+		.."label[5.5,-0.375;"..F(S("Luacontroller")).."]"
 		.."label[0.1,8.3;"..errmsg.."]"
 		.."textarea[0.2,0.2;12.2,9.5;code;;"..code.."]"
-		.."image_button[4.75,8.75;2.5,1;jeija_luac_runbutton.png;program;]"
+		.."button[4.75,8.75;2.5,1;program;"..F(S("Execute")).."]"
 		.."image_button_exit[11.72,-0.25;0.425,0.4;jeija_close_window.png;exit;]"
 		)
 end
@@ -807,7 +811,7 @@ for d = 0, 1 do
 	}
 
 	minetest.register_node(node_name, {
-		description = "Luacontroller",
+		description = S("Luacontroller"),
 		drawtype = "nodebox",
 		tiles = {
 			top,

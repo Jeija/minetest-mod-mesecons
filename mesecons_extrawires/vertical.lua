@@ -1,3 +1,5 @@
+local S = minetest.get_translator("mesecons_extrawires")
+
 local vertical_box = {
 	type = "fixed",
 	fixed = {-1/16, -8/16, -1/16, 1/16, 8/16, 1/16}
@@ -77,7 +79,7 @@ end
 
 -- Vertical wire
 mesecon.register_node("mesecons_extrawires:vertical", {
-	description = "Vertical Mesecon",
+	description = S("Vertical Mesecon"),
 	drawtype = "nodebox",
 	walkable = false,
 	paramtype = "light",
@@ -110,7 +112,7 @@ mesecon.register_node("mesecons_extrawires:vertical", {
 
 -- Vertical wire top
 mesecon.register_node("mesecons_extrawires:vertical_top", {
-	description = "Vertical mesecon",
+	description = S("Vertical Mesecon"),
 	drawtype = "nodebox",
 	walkable = false,
 	paramtype = "light",
@@ -142,7 +144,7 @@ mesecon.register_node("mesecons_extrawires:vertical_top", {
 
 -- Vertical wire bottom
 mesecon.register_node("mesecons_extrawires:vertical_bottom", {
-	description = "Vertical mesecon",
+	description = S("Vertical Mesecon"),
 	drawtype = "nodebox",
 	walkable = false,
 	paramtype = "light",

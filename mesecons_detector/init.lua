@@ -1,3 +1,6 @@
+local S = minetest.get_translator("mesecons_detector")
+local F = minetest.formspec_escape
+
 local GET_COMMAND = "GET"
 
 -- Object detector
@@ -7,9 +10,9 @@ local GET_COMMAND = "GET"
 local function object_detector_make_formspec(pos)
 	local meta = minetest.get_meta(pos)
 	meta:set_string("formspec", "size[9,2.5]" ..
-		"field[0.3,  0;9,2;scanname;Name of player to scan for (empty for any):;${scanname}]"..
-		"field[0.3,1.5;4,2;digiline_channel;Digiline Channel (optional):;${digiline_channel}]"..
-		"button_exit[7,0.75;2,3;;Save]")
+		"field[0.3,  0;9,2;scanname;"..F(S("Name of player to scan for (empty for any):"))..";${scanname}]"..
+		"field[0.3,1.5;4,2;digiline_channel;"..F(S("Digiline Channel (optional):"))..";${digiline_channel}]"..
+		"button_exit[7,0.75;2,3;;"..F(S("Save")).."]")
 end
 
 local function object_detector_on_receive_fields(pos, formname, fields, sender)
@@ -69,7 +72,7 @@ minetest.register_node("mesecons_detector:object_detector_off", {
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3},
-	description="Player Detector",
+	description=S("Player Detector"),
 	mesecons = {receptor = {
 		state = mesecon.state.off,
 		rules = mesecon.rules.pplate
@@ -150,10 +153,10 @@ local function node_detector_make_formspec(pos)
 	local meta = minetest.get_meta(pos)
 	if meta:get_string("distance") == ""  then meta:set_string("distance", "0") end
 	meta:set_string("formspec", "size[9,2.5]" ..
-		"field[0.3,  0;9,2;scanname;Name of node to scan for (empty for any):;${scanname}]"..
-		"field[0.3,1.5;2.5,2;distance;Distance (0-"..mesecon.setting("node_detector_distance_max", 10).."):;${distance}]"..
-		"field[3,1.5;4,2;digiline_channel;Digiline Channel (optional):;${digiline_channel}]"..
-		"button_exit[7,0.75;2,3;;Save]")
+		"field[0.3,  0;9,2;scanname;"..F(S("Name of node to scan for (empty for any):"))..";${scanname}]"..
+		"field[0.3,1.5;2.5,2;distance;"..F(S("Distance (0-@1):", mesecon.setting("node_detector_distance_max", 10)))..";${distance}]"..
+		"field[3,1.5;4,2;digiline_channel;"..F(S("Digiline Channel (optional):"))..";${digiline_channel}]"..
+		"button_exit[7,0.75;2,3;;"..F(S("Save")).."]")
 end
 
 local function node_detector_on_receive_fields(pos, fieldname, fields, sender)
@@ -262,7 +265,7 @@ minetest.register_node("mesecons_detector:node_detector_off", {
 	is_ground_content = false,
 	walkable = true,
 	groups = {cracky=3},
-	description="Node Detector",
+	description=S("Node Detector"),
 	mesecons = {receptor = {
 		state = mesecon.state.off
 	}},
