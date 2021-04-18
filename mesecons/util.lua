@@ -193,6 +193,24 @@ function mesecon.tablecopy(obj) -- deep copy
 	return obj
 end
 
+-- Performs a deep copy of a table, changing the environment of any functions.
+-- Adapted from the builtin table.copy() function.
+function mesecon.tablecopy_change_env(t, env, seen)
+	local n = {}
+	seen = seen or {}
+	seen[t] = n
+	for k, v in pairs(t) do
+		if type(v) == "function" then
+			setfenv(v, env)
+			n[(type(k) == "table" and (seen[k] or mesecon.tablecopy_change_env(k, env, seen))) or k] = v
+		else
+		n[(type(k) == "table" and (seen[k] or mesecon.tablecopy_change_env(k, env, seen))) or k] =
+			(type(v) == "table" and (seen[v] or mesecon.tablecopy_change_env(v, env, seen))) or v
+		end
+	end
+	return n
+end
+
 -- Returns whether two values are equal.
 -- In tables, keys are compared for identity but values are compared recursively.
 -- There is no protection from infinite recursion.

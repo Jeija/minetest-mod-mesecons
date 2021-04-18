@@ -459,6 +459,24 @@ local function get_digiline_send(pos, itbl, send_warning)
 	end
 end
 
+-- Mods can place their own "libraries" in here to be loaded via require() from in a Luacontroller.
+-- These can take two different forms:
+-- Function (recommended for libraries adding new functionality): A function that, when called, returns something that will be passed to the LuaC code.
+-- Function signature is getlibrary(env, pos) where 'env' is the environment that the Luacontroller code is running in, and 'pos' is the position of the controller.
+-- Table (recommended for libraries containing mostly lookup tables): A table that will be copied, and the copy returned to the LuaC code.
+-- When using the table format, any functions in the table will have their environment changed to that of the Luacontroller.
+mesecon.luacontroller_libraries = {}
+
+local function get_require(pos, env)
+	return function(name)
+		if type(mesecon.luacontroller_libraries[name]) == "function" then
+			return mesecon.luacontroller_libraries[name](env, pos)
+		elseif type(mesecon.luacontroller_libraries[name]) == "table" then
+			return mesecon.tablecopy_change_env(mesecon.luacontroller_libraries[name], env)
+		end
+	end
+end
+
 local safe_globals = {
 	-- Don't add pcall/xpcall unless willing to deal with the consequences (unless very careful, incredibly likely to allow killing server indirectly)
 	"assert", "error", "ipairs", "next", "pairs", "select",
@@ -546,6 +564,8 @@ local function create_environment(pos, mem, event, itbl, send_warning)
 	for _, name in pairs(safe_globals) do
 		env[name] = _G[name]
 	end
+	
+	env.require = get_require(pos, env)
 
 	return env
 end
