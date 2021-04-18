@@ -1,9 +1,37 @@
 [mesecons]
 
+# Number of seconds to wait after server start before starting to execute actions
+# from the actionqueue.
 mesecon.resumetime (Startup delay) int 4 1 10
-mesecon.overheat_max (Device heat limit) int 20 1 100
-mesecon.cooldown_time (Device cooldown time) float 2.0 0.1 10.0
-mesecon.cooldown_granularity (Cooldown step length) float 0.5 0.0 1.0
+
+# Heat at which a device overheats.
+# As a rule of thumb, a device gets 1 additional heat each time when it toggles.
+mesecon.overheat_max (Device heat limit) float 20.0 1.0
+
+# The method used to cooldown devices over time:
+# - seconds: The cooldown will happen per seconds.
+#   Use mesecon.cooldown_time and mesecon.cooldown_granularity for further configuration.
+# - steps: The cooldown will happen per server steps.
+#   Use mesecon.cooldown_time_steps and mesecon.cooldown_granularity_steps for further configuration.
+mesecon.cooldown_mode (Device cooldown mode) enum steps seconds,steps
+
+# The time in seconds it takes for a device to fully cool down from max heat.
+# Only used if mesecon.cooldown_mode is seconds.
+mesecon.cooldown_time (Device cooldown time in seconds) float 2.0 0.0
+
+# Length in seconds of the interval in which devices are cooled down over time.
+# This does not affect the cooldown speed.
+# Only used if mesecon.cooldown_mode is seconds.
+mesecon.cooldown_granularity (Cooldown step length in seconds) float 0.5 0.0
+
+# The time in server steps it takes for a device to fully cool down from max heat.
+# Only used if mesecon.cooldown_mode is steps.
+mesecon.cooldown_time_steps (Device cooldown time in server steps) float 125.0 0.0
+
+# Length in server steps of the interval in which devices are cooled down over time.
+# This does not affect the cooldown speed.
+# Only used if mesecon.cooldown_mode is steps.
+mesecon.cooldown_granularity_steps (Cooldown step length in server steps) int 20 0
 
 
 [mesecons_blinkyplant]

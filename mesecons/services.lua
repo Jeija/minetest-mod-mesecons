@@ -74,9 +74,16 @@ minetest.register_on_placenode(mesecon.on_placenode)
 minetest.register_on_dignode(mesecon.on_dignode)
 
 -- Overheating service for fast circuits
-local OVERHEAT_MAX = mesecon.setting("overheat_max", 20)
-local COOLDOWN_TIME = mesecon.setting("cooldown_time", 2.0)
-local COOLDOWN_STEP = mesecon.setting("cooldown_granularity", 0.5)
+local OVERHEAT_MAX = math.max(1.0, mesecon.setting("overheat_max", 20.0))
+local COOLDOWN_MODE = mesecon.setting("cooldown_mode", "steps")
+local COOLDOWN_IN_STEPS = COOLDOWN_MODE == "steps"
+-- default for steps assumes a dtime of 0.016 seconds
+local COOLDOWN_TIME = math.max(0.0, COOLDOWN_IN_STEPS and
+		mesecon.setting("cooldown_time_steps", 125.0) or
+		mesecon.setting("cooldown_time", 2.0))
+local COOLDOWN_STEP = math.max(0.0, COOLDOWN_IN_STEPS and
+		mesecon.setting("cooldown_granularity_steps", 20) or
+		mesecon.setting("cooldown_granularity", 0.5))
 local COOLDOWN_MULTIPLIER = OVERHEAT_MAX / COOLDOWN_TIME
 local cooldown_timer = 0.0
 local object_heat = {}
@@ -118,7 +125,7 @@ function mesecon.move_hot_nodes(moved_nodes)
 end
 
 local function global_cooldown(dtime)
-	cooldown_timer = cooldown_timer + dtime
+	cooldown_timer = cooldown_timer + (COOLDOWN_IN_STEPS and 1 or dtime)
 	if cooldown_timer < COOLDOWN_STEP then
 		return -- don't overload the CPU
 	end
