@@ -158,6 +158,13 @@ function mesecon.getstate(nodename, states)
 	error(nodename.." doesn't mention itself in "..dump(states))
 end
 
+function mesecon.setstate(pos, node, newstate)
+	local nodedef = minetest.registered_nodes[node.name]
+
+	minetest.swap_node(pos, {name = nodedef.__mesecon_basename .. "_" .. newstate,
+		param2 = node.param2})
+end
+
 function mesecon.getbinstate(nodename, states)
 	return mesecon.dec2bin(mesecon.getstate(nodename, states)-1)
 end
