@@ -52,6 +52,11 @@ mesecon.movestone_max_pull (Max pull) int 50 1 100
 mesecon.piston_max_push (Max push) int 15 1 100
 mesecon.piston_max_pull (Max pull) int 15 1 100
 
+# Delay between piston power on/off and actual push/pull.
+# Zero means minimal possible delay. Negative value means
+# synchronous action (old behavior).
+mesecon.piston_delay (Delay) float 0.15 -1 3.0
+
 
 [mesecons_pressureplates]
 

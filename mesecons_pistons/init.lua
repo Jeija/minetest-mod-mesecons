@@ -78,8 +78,11 @@ local function piston_after_dig(pos, node)
 	piston_remove_pusher(pos, node, true)
 end
 
-local piston_on = function(pos, node)
+local function piston_on(pos, node)
 	local pistonspec = get_pistonspec(node.name, "offname")
+	if not pistonspec then -- it may be called asynchronously now, don’t crash if something goes wrong
+		return
+	end
 	local dir = vector.multiply(minetest.facedir_to_dir(node.param2), -1)
 	local pusher_pos = vector.add(pos, dir)
 	local meta = minetest.get_meta(pos)
@@ -99,6 +102,9 @@ end
 
 local function piston_off(pos, node)
 	local pistonspec = get_pistonspec(node.name, "onname")
+	if not pistonspec then
+		return
+	end
 	minetest.swap_node(pos, {param2 = node.param2, name = pistonspec.offname})
 	piston_remove_pusher(pos, node, not pistonspec.sticky) -- allow that even in protected area
 
@@ -112,6 +118,29 @@ local function piston_off(pos, node)
 	if success then
 		mesecon.mvps_move_objects(pullpos, vector.multiply(dir, -1), oldstack, -1)
 	end
+end
+
+-- not on/off as power state may change faster than the piston state
+mesecon.queue:add_function("piston_switch", function(pos)
+	local node = mesecon.get_node_force(pos)
+	if mesecon.is_powered(pos) then
+		piston_on(pos, node)
+	else
+		piston_off(pos, node)
+	end
+end)
+
+local piston_on_delayed, piston_off_delayed
+local delay = mesecon.setting("piston_delay", 0.15)
+if delay >= 0 then
+	local function piston_switch_delayed(pos, node)
+		mesecon.queue:add_action(pos, "piston_switch", {}, delay, "piston_switch")
+	end
+	piston_on_delayed = piston_switch_delayed
+	piston_off_delayed = piston_switch_delayed
+else
+	piston_on_delayed = piston_on
+	piston_off_delayed = piston_off
 end
 
 local orientations = {
@@ -281,7 +310,7 @@ minetest.register_node("mesecons_pistons:piston_normal_off", {
 	after_place_node = piston_orientate,
 	sounds = default.node_sound_wood_defaults(),
 	mesecons = {effector={
-		action_on = piston_on,
+		action_on = piston_on_delayed,
 		rules = piston_get_rules,
 	}},
 	on_punch = piston_punch,
@@ -311,7 +340,7 @@ minetest.register_node("mesecons_pistons:piston_normal_on", {
 	selection_box = piston_on_box,
 	sounds = default.node_sound_wood_defaults(),
 	mesecons = {effector={
-		action_off = piston_off,
+		action_off = piston_off_delayed,
 		rules = piston_get_rules,
 	}},
 	on_rotate = piston_rotate_on,
@@ -360,7 +389,7 @@ minetest.register_node("mesecons_pistons:piston_sticky_off", {
 	after_place_node = piston_orientate,
 	sounds = default.node_sound_wood_defaults(),
 	mesecons = {effector={
-		action_on = piston_on,
+		action_on = piston_on_delayed,
 		rules = piston_get_rules,
 	}},
 	on_punch = piston_punch,
@@ -390,7 +419,7 @@ minetest.register_node("mesecons_pistons:piston_sticky_on", {
 	selection_box = piston_on_box,
 	sounds = default.node_sound_wood_defaults(),
 	mesecons = {effector={
-		action_off = piston_off,
+		action_off = piston_off_delayed,
 		rules = piston_get_rules,
 	}},
 	on_rotate = piston_rotate_on,
