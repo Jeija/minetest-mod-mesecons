@@ -38,7 +38,8 @@
 			"Red" : "mesecons_lightstone/doc/lightstone_red",
 			"Blue" : "mesecons_lightstone/doc/lightstone_blue",
 			"Yellow" : "mesecons_lightstone/doc/lightstone_yellow"
-		}
+		},
+		"Droppers" : "mesecons_dropper/doc/dropper"
 	},
 	"Logic" : {
 		"Luacontroller" : "mesecons_luacontroller/doc/luacontroller",

@@ -1,0 +1,4 @@
+# textdomain: mesecons_dropper
+Dropper=
+Downwards-Facing Dropper=
+Upwards-Facing Dropper=
