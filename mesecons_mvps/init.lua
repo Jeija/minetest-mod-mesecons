@@ -55,11 +55,16 @@ end
 
 -- tests if the node can be pushed into, e.g. air, water, grass
 local function node_replaceable(name)
-	if minetest.registered_nodes[name] then
-		return minetest.registered_nodes[name].buildable_to or false
+	local nodedef = minetest.registered_nodes[name]
+
+	-- everything that can be an mvps stopper (unknown nodes and nodes in the
+	-- mvps_stoppers table) must not be replacable
+	-- Note: ignore (a stopper) is buildable_to, but we do not want to push into it
+	if not nodedef or mesecon.mvps_stoppers[name] then
+		return false
 	end
 
-	return false
+	return nodedef.buildable_to or false
 end
 
 function mesecon.mvps_get_stack(pos, dir, maximum, all_pull_sticky)
