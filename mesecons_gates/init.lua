@@ -128,40 +128,45 @@ local function register_gate(name, inputnumber, assess, recipe, description)
 	minetest.register_craft({output = basename.."_off", recipe = recipe})
 end
 
+local _ = ""
+local m = "group:mesecon_conductor_craftable"
+local t = "mesecons_torch:mesecon_torch_on"
+local s = "mesecons_materials:silicon"
+
 register_gate("diode", 1, function (input) return input end,
-	{{"mesecons:mesecon", "mesecons_torch:mesecon_torch_on", "mesecons_torch:mesecon_torch_on"}},
+	{{m, t, t}},
 	"Diode")
 
 register_gate("not", 1, function (input) return not input end,
-	{{"mesecons:mesecon", "mesecons_torch:mesecon_torch_on", "mesecons:mesecon"}},
+	{{m, t, m}},
 	"NOT Gate")
 
 register_gate("and", 2, function (val1, val2) return val1 and val2 end,
-	{{"mesecons:mesecon", "", ""},
-	 {"", "mesecons_materials:silicon", "mesecons:mesecon"},
-	 {"mesecons:mesecon", "", ""}},
+	{{m, t, _},
+	 {_, s, t},
+	 {m, t, _}},
 	"AND Gate")
 
 register_gate("nand", 2, function (val1, val2) return not (val1 and val2) end,
-	{{"mesecons:mesecon", "", ""},
-	 {"", "mesecons_materials:silicon", "mesecons_torch:mesecon_torch_on"},
-	 {"mesecons:mesecon", "", ""}},
+	{{m, t, _},
+	 {_, s, m},
+	 {m, t, _}},
 	"NAND Gate")
 
 register_gate("xor", 2, function (val1, val2) return (val1 or val2) and not (val1 and val2) end,
-	{{"mesecons:mesecon", "", ""},
-	 {"", "mesecons_materials:silicon", "mesecons_materials:silicon"},
-	 {"mesecons:mesecon", "", ""}},
+	{{m, t, _},
+	 {s, s, m},
+	 {m, t, _}},
 	"XOR Gate")
 
 register_gate("nor", 2, function (val1, val2) return not (val1 or val2) end,
-	{{"mesecons:mesecon", "", ""},
-	 {"", "mesecons:mesecon", "mesecons_torch:mesecon_torch_on"},
-	 {"mesecons:mesecon", "", ""}},
+	{{m, _, _},
+	 {_, s, t},
+	 {m, _, _}},
 	"NOR Gate")
 
 register_gate("or", 2, function (val1, val2) return (val1 or val2) end,
-	{{"mesecons:mesecon", "", ""},
-	 {"", "mesecons:mesecon", "mesecons:mesecon"},
-	 {"mesecons:mesecon", "", ""}},
+	{{m, _, _},
+	 {_, s, m},
+	 {m, _, _}},
 	"OR Gate")

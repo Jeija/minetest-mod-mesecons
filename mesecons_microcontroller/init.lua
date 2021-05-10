@@ -152,27 +152,14 @@ end
 end
 end
 
-if minetest.get_modpath("mesecons_luacontroller") then
-	minetest.register_craft({
-		type = "shapeless",
-		output = "mesecons_microcontroller:microcontroller0000",
-		recipe = {"mesecons_luacontroller:luacontroller0000"},
-	})
-	minetest.register_craft({
-		type = "shapeless",
-		output = "mesecons_luacontroller:luacontroller0000",
-		recipe = {"mesecons_microcontroller:microcontroller0000"},
-	})
-else
-	minetest.register_craft({
-		output = 'craft "mesecons_microcontroller:microcontroller0000" 2',
-		recipe = {
-			{'mesecons_materials:silicon', 'mesecons_materials:silicon', 'group:mesecon_conductor_craftable'},
-			{'mesecons_materials:silicon', 'mesecons_materials:silicon', 'group:mesecon_conductor_craftable'},
-			{'group:mesecon_conductor_craftable', 'group:mesecon_conductor_craftable', ''},
-		}
-	})
-end
+minetest.register_craft({
+	output = "mesecons_microcontroller:microcontroller0000 2",
+	recipe = {
+		{'mesecons_materials:silicon', 'mesecons_materials:silicon', 'group:mesecon_conductor_craftable'},
+		{'mesecons_materials:silicon', 'mesecons_materials:silicon', 'group:mesecon_conductor_craftable'},
+		{'group:mesecon_conductor_craftable', 'group:mesecon_conductor_craftable', ''},
+	}
+})
 
 yc.reset = function(pos)
 	yc.action(pos, {a=false, b=false, c=false, d=false})
