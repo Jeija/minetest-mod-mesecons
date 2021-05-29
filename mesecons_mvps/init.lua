@@ -294,8 +294,8 @@ function mesecon.mvps_move_objects(pos, dir, nodestack, movefactor)
 		for k, v in pairs(pos) do
 			local edge1, edge2
 			if k ~= dir_k then
-				edge1 = v - 0.51 -- More than 0.5 to move objects near to the stack.
-				edge2 = v + 0.51
+				edge1 = v - 0.499 -- Slightly less than 0.5 so that players next to the stack don't get dragged with it
+				edge2 = v + 0.499
 			else
 				edge1 = v - 0.5 * dir_l
 				edge2 = v + (#nodestack + 0.5 * movefactor) * dir_l
