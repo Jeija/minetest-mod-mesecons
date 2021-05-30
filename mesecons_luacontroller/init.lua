@@ -225,10 +225,23 @@ end
 local function safe_string_find(...)
 	if (select(4, ...)) ~= true then
 		debug.sethook() -- Clear hook
-		error("string.find: 'plain' (fourth parameter) must always be true in a Luacontroller")
+		error("string.find: 'plain' (fourth parameter) must always be true in a Luacontroller", 2)
 	end
 
 	return string.find(...)
+end
+
+-- pcall can capture certain errors after the debug hook is removed.
+-- Detect these errors, and propagate them.
+local function safe_pcall(f, ...)
+	local values = {pcall(f, ...)}
+	local ok, err = values[1], values[2]
+	
+	if not debug.gethook() then
+		error(string.gsub(err, "%(load%)%:.+:%s", ""), 2)
+	end
+	
+	return unpack(values)
 end
 
 local function remove_functions(x)
@@ -462,7 +475,7 @@ end
 local safe_globals = {
 	-- Don't add pcall/xpcall unless willing to deal with the consequences (unless very careful, incredibly likely to allow killing server indirectly)
 	"assert", "error", "ipairs", "next", "pairs", "select",
-	"tonumber", "tostring", "type", "unpack", "_VERSION"
+	"tonumber", "tostring", "type", "unpack", "_VERSION", "error"
 }
 
 local function create_environment(pos, mem, event, itbl, send_warning)
@@ -484,6 +497,7 @@ local function create_environment(pos, mem, event, itbl, send_warning)
 		print = safe_print,
 		interrupt = get_interrupt(pos, itbl, send_warning),
 		digiline_send = get_digiline_send(pos, itbl, send_warning),
+		pcall = safe_pcall,
 		string = {
 			byte = string.byte,
 			char = string.char,
