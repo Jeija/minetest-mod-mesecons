@@ -231,6 +231,16 @@ local function safe_string_find(...)
 	return string.find(...)
 end
 
+-- do not allow pattern matching in string.split (see string.find for details)
+local function safe_string_split(...)
+	if select(5, ...) then
+		debug.sethook() -- Clear hook
+		error("string.split: 'sep_is_pattern' (fifth parameter) may not be used in a Luacontroller")
+	end
+
+	return string.split(...)
+end
+
 local function remove_functions(x)
 	local tp = type(x)
 	if tp == "function" then
@@ -495,51 +505,34 @@ local function create_environment(pos, mem, event, itbl, send_warning)
 			reverse = string.reverse,
 			sub = string.sub,
 			find = safe_string_find,
+			split = safe_string_split,
 		},
-		math = {
-			abs = math.abs,
-			acos = math.acos,
-			asin = math.asin,
-			atan = math.atan,
-			atan2 = math.atan2,
-			ceil = math.ceil,
-			cos = math.cos,
-			cosh = math.cosh,
-			deg = math.deg,
-			exp = math.exp,
-			floor = math.floor,
-			fmod = math.fmod,
-			frexp = math.frexp,
-			huge = math.huge,
-			ldexp = math.ldexp,
-			log = math.log,
-			log10 = math.log10,
-			max = math.max,
-			min = math.min,
-			modf = math.modf,
-			pi = math.pi,
-			pow = math.pow,
-			rad = math.rad,
-			random = math.random,
-			sin = math.sin,
-			sinh = math.sinh,
-			sqrt = math.sqrt,
-			tan = math.tan,
-			tanh = math.tanh,
-		},
-		table = {
-			concat = table.concat,
-			insert = table.insert,
-			maxn = table.maxn,
-			remove = table.remove,
-			sort = table.sort,
-		},
+		math = table.copy(math),
+		table = table.copy(table),
 		os = {
 			clock = os.clock,
 			difftime = os.difftime,
 			time = os.time,
 			datetable = safe_date,
 		},
+		dump2 = dump2,
+		dump = dump,
+		minetest = {
+			--wrap_text = minetest.wrap_text,
+			pos_to_string = minetest.pos_to_string,
+			string_to_pos = minetest.string_to_pos,
+			string_to_area = minetest.string_to_area,
+			formspec_escape = minetest.formspec_escape,
+			is_yes = minetest.is_yes,
+			is_nan = minetest.is_nan,
+			get_us_time = minetest.get_us_time,
+			parse_json = minetest.parse_json,
+			write_json = minetest.write_json,
+			rgba = minetest.rgba,
+			encode_base64 = minetest.encode_base64,
+			decode_base64 = minetest.decode_base64,
+		},
+		vector = table.copy(vector),
 	}
 	env._G = env
 
