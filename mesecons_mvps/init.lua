@@ -29,6 +29,9 @@ function mesecon.is_mvps_stopper(node, pushdir, stack, stackid)
 end
 
 function mesecon.register_mvps_stopper(nodename, get_stopper)
+	if minetest.registered_nodes[nodename] and minetest.registered_nodes[nodename].buildable_to then
+		minetest.log("warning", ("Registering a buildable-to node \"%s\" as a mesecon stopper, this is not supported"):format(nodename))
+	end
 	if get_stopper == nil then
 			get_stopper = true
 	end
@@ -70,6 +73,10 @@ function mesecon.mvps_get_stack(pos, dir, maximum, all_pull_sticky)
 	while #frontiers > 0 do
 		local np = frontiers[1]
 		local nn = minetest.get_node(np)
+
+		-- Never push into unloaded blocks. Don’t try to pull from them, either.
+		-- TODO: load blocks instead, as with wires.
+		if nn.name == "ignore" then return nil end
 
 		if not node_replaceable(nn.name) then
 			table.insert(nodes, {node = nn, pos = np})
@@ -326,10 +333,6 @@ function mesecon.mvps_move_objects(pos, dir, nodestack, movefactor)
 		end
 	end
 end
-
--- Never push into unloaded blocks. Don’t try to pull from them, either.
--- TODO: load blocks instead, as with wires.
-mesecon.register_mvps_stopper("ignore")
 
 mesecon.register_mvps_stopper("doors:door_steel_b_1")
 mesecon.register_mvps_stopper("doors:door_steel_t_1")
