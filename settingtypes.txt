@@ -52,6 +52,18 @@ mesecon.movestone_max_pull (Max pull) int 50 1 100
 mesecon.piston_max_push (Max push) int 15 1 100
 mesecon.piston_max_pull (Max pull) int 15 1 100
 
+# Unlike most devices, pistons don't break permanently
+# after overheating. They cooldown automatically (unless
+# disabled, see piston_cooldown_method) after given amount
+# of time, becoming working again.
+mesecon.piston_cooldown_time (Piston cooldown time, in seconds) float 5.0 1.0 60.0
+
+# Cooldown method can be choosen:
+# - timer: cooldown happens in active blocks only (but the timer itself persists even server restarts)
+# - actionqueue: cooldown happens when its time comes. Persists server restarts too.
+# - none: disable cooldown. Queued events are discarded.
+mesecon.piston_cooldown_method (Piston cooldown method) enum timer timer,actionqueue,none
+
 
 [mesecons_pressureplates]
 

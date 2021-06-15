@@ -2,11 +2,13 @@ local specs = {
 	normal = {
 		offname = "mesecons_pistons:piston_normal_off",
 		onname = "mesecons_pistons:piston_normal_on",
+		hotname = "mesecons_pistons:piston_normal_overheated",
 		pusher = "mesecons_pistons:piston_pusher_normal",
 	},
 	sticky = {
 		offname = "mesecons_pistons:piston_sticky_off",
 		onname = "mesecons_pistons:piston_sticky_on",
+		hotname = "mesecons_pistons:piston_sticky_overheated",
 		pusher = "mesecons_pistons:piston_pusher_sticky",
 		sticky = true,
 	},
@@ -36,6 +38,8 @@ end
 
 local max_push = mesecon.setting("piston_max_push", 15)
 local max_pull = mesecon.setting("piston_max_pull", 15)
+local cooldown_time = mesecon.setting("piston_cooldown_time", 5.0)
+local cooldown_method = mesecon.setting("piston_cooldown_method", "timer")
 
 -- Get mesecon rules of pistons
 local function piston_get_rules(node)
@@ -80,6 +84,15 @@ end
 
 local piston_on = function(pos, node)
 	local pistonspec = get_pistonspec(node.name, "offname")
+	if mesecon.do_overheat(pos) then
+		minetest.swap_node(pos, {param2 = node.param2, name = pistonspec.hotname})
+		if cooldown_method == "timer" then
+			minetest.get_node_timer(pos):start(cooldown_time)
+		elseif cooldown_method == "actionqueue" then
+			mesecon.queue:add_action(pos, "piston_cooldown", {}, cooldown_time, "piston_cooldown")
+		end
+		return
+	end
 	local dir = vector.multiply(minetest.facedir_to_dir(node.param2), -1)
 	local pusher_pos = vector.add(pos, dir)
 	local meta = minetest.get_meta(pos)
@@ -112,6 +125,19 @@ local function piston_off(pos, node)
 	if success then
 		mesecon.mvps_move_objects(pullpos, vector.multiply(dir, -1), oldstack, -1)
 	end
+end
+
+local piston_cooldown
+if cooldown_method ~= "none" then
+	function piston_cooldown(pos)
+		local node = mesecon.get_node_force(pos)
+		local pistonspec = get_pistonspec(node.name, "hotname")
+		if not pistonspec then return end
+		node.name = pistonspec.offname
+		minetest.swap_node(pos, node)
+		if mesecon.is_powered(pos) then piston_on(pos, node) end
+	end
+	mesecon.queue:add_function("piston_cooldown", piston_cooldown)
 end
 
 local orientations = {
@@ -318,6 +344,30 @@ minetest.register_node("mesecons_pistons:piston_normal_on", {
 	on_blast = mesecon.on_blastnode,
 })
 
+-- hotstate
+minetest.register_node("mesecons_pistons:piston_normal_overheated", {
+	description = "Piston (overheated)",
+	tiles = {
+		"mesecons_piston_top.png",
+		"mesecons_piston_bottom.png",
+		"mesecons_piston_left.png",
+		"mesecons_piston_right.png",
+		"mesecons_piston_back.png",
+		"mesecons_piston_pusher_front.png"
+	},
+	groups = {cracky = 3, not_in_creative_inventory = 1},
+	paramtype2 = "facedir",
+	is_ground_content = false,
+	drop = "mesecons_pistons:piston_normal_off",
+	sounds = default.node_sound_wood_defaults(),
+	mesecons = {effector={
+		rules = piston_get_rules, -- провода остаются на месте
+	}},
+	on_timer = piston_cooldown,
+	on_rotate = piston_rotate,
+	on_blast = mesecon.on_blastnode,
+})
+
 -- pusher
 minetest.register_node("mesecons_pistons:piston_pusher_normal", {
 	description = "Piston Pusher",
@@ -394,6 +444,29 @@ minetest.register_node("mesecons_pistons:piston_sticky_on", {
 		rules = piston_get_rules,
 	}},
 	on_rotate = piston_rotate_on,
+	on_blast = mesecon.on_blastnode,
+})
+
+-- hotstate
+minetest.register_node("mesecons_pistons:piston_sticky_overheated", {
+	description = "Sticky Piston",
+	tiles = {
+		"mesecons_piston_top.png",
+		"mesecons_piston_bottom.png",
+		"mesecons_piston_left.png",
+		"mesecons_piston_right.png",
+		"mesecons_piston_back.png",
+		"mesecons_piston_pusher_front_sticky.png"
+	},
+	groups = {cracky = 3, not_in_creative_inventory = 1},
+	paramtype2 = "facedir",
+	is_ground_content = false,
+	sounds = default.node_sound_wood_defaults(),
+	mesecons = {effector={
+		rules = piston_get_rules, -- провода остаются на месте
+	}},
+	on_timer = piston_cooldown,
+	on_rotate = piston_rotate,
 	on_blast = mesecon.on_blastnode,
 })
 
