@@ -16,7 +16,7 @@ mesecon.on_placenode = function(pos, node)
 			-- also call receptor_on if itself is powered already, so that neighboring
 			-- conductors will be activated (when pushing an on-conductor with a piston)
 			for _, s in ipairs(sources) do
-				local rule = vector.subtract(pos, s)
+				local rule = vector.subtract(s, pos)
 				mesecon.turnon(pos, rule)
 			end
 			--mesecon.receptor_on (pos, mesecon.conductor_get_rules(node))
